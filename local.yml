@@ -1,0 +1,32 @@
+version: '3.6'
+
+volumes:
+  keycloak_postgres_data: {}
+
+services:
+  postgres-keycloak:
+      image: postgres:10-alpine
+      container_name: postgres
+      volumes:
+        - keycloak_postgres_data:/var/lib/postgresql/data
+      environment:
+        POSTGRES_DB: keycloak
+        POSTGRES_USER: keycloak
+        POSTGRES_PASSWORD: password
+        
+  keycloak:
+      image: jboss/keycloak:4.1.0.Final
+      environment:
+        DB_VENDOR: POSTGRES
+        DB_ADDR: postgres
+        DB_DATABASE: keycloak
+        DB_USER: keycloak
+        DB_PASSWORD: password
+        KEYCLOAK_USER: admin
+        KEYCLOAK_PASSWORD: testing
+      ports:
+        - 8088:8080
+      volumes:
+        - ./themes/puretalent:/opt/jboss/keycloak/themes/puretalent
+      depends_on:
+        - postgres-keycloak
